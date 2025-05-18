@@ -3,6 +3,9 @@ package com.todolist.entity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import com.todolist.entity.User;
 
 @Entity
 public class Todo {
@@ -15,6 +18,12 @@ public class Todo {
 
     @Enumerated(EnumType.STRING)
     private TodoStatus status = TodoStatus.PENDING;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private int viewCount = 0;
 
     @OneToMany(mappedBy = "todo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubTask> subTasks = new ArrayList<>();
@@ -41,5 +50,24 @@ public class Todo {
 
     public TodoStatus getStatus() {
         return status;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+    public List<SubTask> getSubTasks() {
+        return subTasks;
     }
 }
