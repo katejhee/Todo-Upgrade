@@ -6,6 +6,7 @@ import com.todolist.entity.SubTask;
 import com.todolist.entity.Todo;
 import com.todolist.entity.TodoStatus;
 import com.todolist.repository.TodoRepository;
+import com.todolist.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class TodoService {
 
     private final TodoRepository todoRepository;
+    private final UserRepository userRepository;
 
     public Todo createTodo(TodoCreateRequest request) {
         Todo todo = new Todo();
@@ -58,5 +60,20 @@ public class TodoService {
             throw new IllegalArgumentException("삭제할 TODO가 존재하지 않습니다.");
         }
         todoRepository.deleteAll(todos);
+    }
+
+    public java.util.List<Todo> getTodosByUserId(Long userId, boolean increaseViewCount) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+
+        java.util.List<Todo> todos = user.getTodos();
+        if (increaseViewCount) {
+            for (Todo todo : todos) {
+                todo.increaseViewCount();
+            }
+            todoRepository.saveAll(todos);
+        }
+
+        return todos;
     }
 }
